@@ -32,7 +32,7 @@ class ASTAR(object):
         pq.put(0, start_node)  # Start node has 0 cost
 
         visited = set()  # Set to store already visited nodes
-        g_values = {start_node: 0}  # Cost to reach each node
+        g_values = {start_node.state: 0}  # Cost to reach each state
 
         while pq.has_elements():
             current_node = pq.get()
@@ -44,13 +44,14 @@ class ASTAR(object):
 
             for successor in problem.successors(current_node):
                 if successor.state not in visited:
-                    tentative_g_value = g_values[current_node] + successor.cost
+                    tentative_g_value = g_values[current_node.state] + successor.cost
                     if successor.state not in g_values or tentative_g_value < g_values[successor.state]:
                         g_values[successor.state] = tentative_g_value
                         f_value = tentative_g_value + self.heuristic(successor, end_node)
                         pq.put(f_value, successor)
 
         return None
+
 
 # please note that in an ideal world, the heuristics should actually be part
 # of the problem definition, as it assumes domain knowledge about the structure
