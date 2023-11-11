@@ -28,29 +28,36 @@ class ASTAR(object):
         start_node = problem.get_start_node()
         end_node = problem.get_end_node()
 
-        pq = PriorityQueue()  # Priority queue for the fringe
-        pq.put(0, start_node)  # Start node has 0 cost
+        pq = PriorityQueue()
+        pq.put(0, start_node)
 
-        visited = set()  # Set to store already visited nodes
-        g_values = {start_node.state: 0}  # Cost to reach each state
+        g_values = {start_node.state: 0}
+        came_from = {start_node.state: None}
 
         while pq.has_elements():
             current_node = pq.get()
 
             if problem.is_end(current_node):
-                return current_node
-
-            visited.add(current_node.state)
+                return self.reconstruct_path(came_from, current_node)[-1]
 
             for successor in problem.successors(current_node):
-                if successor.state not in visited:
-                    tentative_g_value = g_values[current_node.state] + successor.cost
-                    if successor.state not in g_values or tentative_g_value < g_values[successor.state]:
-                        g_values[successor.state] = tentative_g_value
-                        f_value = tentative_g_value + self.heuristic(successor, end_node)
-                        pq.put(f_value, successor)
+                tentative_g_value = g_values[current_node.state] + successor.cost
+                if successor.state not in g_values or tentative_g_value < g_values[successor.state]:
+                    g_values[successor.state] = tentative_g_value
+                    f_value = tentative_g_value + self.heuristic(successor, end_node)
+                    pq.put(f_value, successor)
+                    came_from[successor.state] = current_node
 
         return None
+
+    @staticmethod
+    def reconstruct_path(came_from, current_node):
+        path = []
+        while current_node:
+            path.append(current_node)
+            current_node = came_from[current_node.state]
+        path.reverse()  # Optional: reverse the path to start to end
+        return path
 
 
 # please note that in an ideal world, the heuristics should actually be part
